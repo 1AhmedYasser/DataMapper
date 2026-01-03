@@ -30,6 +30,12 @@ router.post('/create', async (req, res) => {
   return res.status(result.error ? 400 : 200).json(result);
 });
 
+router.post('/create_multiple', async (req, res) => {
+  const { file_paths, contents } = req.body;
+  const results = await Promise.all(file_paths.map((fp, i) => createFile(buildContentFilePath(fp), contents[i])));
+  res.status(results.some((r) => r.error) ? 400 : 200).json({ results });
+});
+
 router.post('/move', async (req, res) => {
   const filepath = buildContentFilePath(req.body.file_path);
   const newPath = buildContentFilePath(req.body.new_path);

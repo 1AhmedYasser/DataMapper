@@ -52,6 +52,30 @@ router.post('/json_to_yaml_data', (req, res) => {
   }
 });
 
+router.post('/json_to_yaml_data_multiple', (req, res) => {
+  try {
+    const { data: dataArray } = req.body;
+    const results = dataArray.map((item) => {
+      try {
+        let result = stringify(item, { lineWidth: -1 });
+        result = result.replace(/(\n[^\s].+?:)/g, '\n$1');
+        result = result.trimStart();
+        return result;
+      } catch (error) {
+        console.error('Error formatting yaml for item', error);
+        return stringify(item);
+      }
+    });
+    res.send({ yamls: results });
+  } catch (error) {
+    console.error('Error processing yaml conversion', error);
+    res.status(500).send({
+      error: 'Failed to process yaml conversion',
+      details: error.message,
+    });
+  }
+});
+
 router.post(
   '/string-replace',
   [
